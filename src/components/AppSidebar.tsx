@@ -46,10 +46,10 @@ export function AppSidebar() {
   const { open } = useSidebar();
 
   return (
-    <Sidebar className="border-r border-white/5 bg-[#070A10]">
-      <SidebarContent className="flex flex-col justify-between">
-        <div className="space-y-8">
-          <div className="px-6 py-8">
+    <Sidebar className="border-r border-white/5 bg-[#070A10] h-screen sticky top-0 overflow-hidden">
+      <SidebarContent className="flex flex-col justify-between h-full overflow-hidden">
+        <div className="space-y-4">
+          <div className="px-6 py-5">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               PIXEL FLOW LAB
             </h1>
@@ -57,12 +57,12 @@ export function AppSidebar() {
           </div>
 
           {menuSections.map((section) => (
-            <SidebarGroup key={section.label}>
-              <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-widest font-semibold px-4 mb-2">
+            <SidebarGroup key={section.label} className="space-y-1">
+              <SidebarGroupLabel className="text-slate-500 text-xs uppercase tracking-widest font-semibold px-4 mb-1">
                 {section.label}
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="gap-1">
                   {section.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
