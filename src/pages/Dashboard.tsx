@@ -80,7 +80,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-10 relative">
+    <div className="w-full max-w-7xl mx-auto space-y-6 overflow-hidden relative">
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
@@ -88,18 +88,18 @@ export default function Dashboard() {
             <Zap className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
             <div className="absolute inset-0 rounded-2xl bg-violet-500/20 blur-lg group-hover:blur-xl transition-all" />
           </div>
-          <div>
-            <h1 className="text-4xl font-extrabold mb-1 bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tight">
+          <div className="overflow-hidden">
+            <h1 className="text-4xl font-extrabold mb-1 bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tight truncate">
               Bem-vindo de volta
             </h1>
-            <p className="text-slate-400 text-lg font-medium">
+            <p className="text-slate-400 text-lg font-medium truncate">
               Sua central de comando para prospecção e fechamento de negócios.
             </p>
           </div>
         </div>
         <Button
           size="lg"
-          className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/25 px-8 py-6 text-lg font-semibold transition-all hover:scale-105 active:scale-95"
+          className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/25 px-8 py-6 text-lg font-semibold transition-all hover:scale-105 active:scale-95 w-full md:w-auto"
           onClick={() => navigate("/prospector-leads")}
         >
           Iniciar Nova Prospecção
@@ -108,20 +108,20 @@ export default function Dashboard() {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
         {[
           { label: "Leads Encontrados", value: "128", icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
           { label: "Contratos Criados", value: "42", icon: FileCheck, color: "text-emerald-400", bg: "bg-emerald-500/10" },
           { label: "Copies Geradas", value: "89", icon: Sparkles, color: "text-purple-400", bg: "bg-purple-500/10" },
         ].map((metric, i) => (
-          <Card key={i} className="bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group">
+          <Card key={i} className="bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group w-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-400 group-hover:text-slate-300 transition-colors">{metric.label}</p>
-                  <p className="text-3xl font-bold mt-1 text-white">{metric.value}</p>
+                <div className="overflow-hidden">
+                  <p className="text-sm font-medium text-slate-400 group-hover:text-slate-300 transition-colors truncate">{metric.label}</p>
+                  <p className="text-3xl font-bold mt-1 text-white truncate">{metric.value}</p>
                 </div>
-                <div className={`p-3 rounded-xl ${metric.bg} ${metric.color}`}>
+                <div className={`p-3 rounded-xl ${metric.bg} ${metric.color} shrink-0`}>
                   <metric.icon className="h-6 w-6" />
                 </div>
               </div>
@@ -131,16 +131,16 @@ export default function Dashboard() {
       </div>
 
       {/* Workflow Section */}
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold text-white tracking-tight">Fluxo de Trabalho do Prestador de Serviço</h2>
-          <Badge variant="outline" className="text-violet-400 border-violet-500/30 bg-violet-500/10 px-2 py-0">Sequencial</Badge>
+          <h2 className="text-2xl font-bold text-white tracking-tight truncate">Fluxo de Trabalho do Prestador de Serviço</h2>
+          <Badge variant="outline" className="text-violet-400 border-violet-500/30 bg-violet-500/10 px-2 py-0 shrink-0">Sequencial</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
           {workflowSteps.map((step, javaIndex) => (
             <Card
               key={step.title}
-              className="group relative overflow-hidden bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer"
+              className="group relative overflow-hidden bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer w-full"
               onClick={() => navigate(step.route)}
             >
               {/* Neon Top Accent */}
@@ -149,10 +149,10 @@ export default function Dashboard() {
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Passo {step.step}</span>
-                  <step.icon className={`h-5 w-5 ${step.color}`} />
+                  <step.icon className={`h-5 w-5 ${step.color} shrink-0`} />
                 </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">{step.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{step.description}</p>
+                <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors truncate">{step.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed line-clamp-2">{step.description}</p>
                 <div className="flex items-center text-xs font-semibold text-violet-400 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                   Acessar agora <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
@@ -163,11 +163,11 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="lg:col-span-2 bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
+        <Card className="lg:col-span-2 bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 w-full">
           <CardHeader>
-            <CardTitle className="text-xl text-white flex items-center gap-2">
-              <Clock className="h-5 w-5 text-violet-400" />
+            <CardTitle className="text-xl text-white flex items-center gap-2 truncate">
+              <Clock className="h-5 w-5 text-violet-400 shrink-0" />
               Atividades Recentes
             </CardTitle>
           </CardHeader>
@@ -176,16 +176,16 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {recentActivities.map((activity) => (
                   <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/5 hover:border-white/10">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-violet-500/10 text-violet-400">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2 rounded-lg bg-violet-500/10 text-violet-400 shrink-0">
                         {activity.type === 'Lead' ? <Search className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-200">{activity.title}</p>
-                        <p className="text-xs text-slate-500">{activity.date}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-200 truncate">{activity.title}</p>
+                        <p className="text-xs text-slate-500 truncate">{activity.date}</p>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] bg-white/5 text-slate-400 border-white/10">
+                    <Badge variant="secondary" className="text-[10px] bg-white/5 text-slate-400 border-white/10 shrink-0 ml-2">
                       {activity.type}
                     </Badge>
                   </div>
@@ -205,11 +205,11 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          <Card className="bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border-violet-500/30 p-6 shadow-card backdrop-blur-md">
+        <div className="space-y-6 w-full">
+          <Card className="bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border-violet-500/30 p-6 shadow-card backdrop-blur-md w-full">
             <div className="flex items-center gap-2 mb-3">
-              <Zap className="h-5 w-5 text-violet-400" />
-              <h3 className="text-lg font-bold text-white">Dica do Dia 💡</h3>
+              <Zap className="h-5 w-5 text-violet-400 shrink-0" />
+              <h3 className="text-lg font-bold text-white truncate">Dica do Dia 💡</h3>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               Tente personalizar a primeira frase da sua copy com um dado real encontrado no prospector para aumentar a taxa de conversão em até 3x.
