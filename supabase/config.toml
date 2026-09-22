@@ -1,0 +1,13 @@
+project_id = "plsebkepwbteyubkbewg"
+
+[functions.gerar_contrato]
+verify_jwt = false
+
+[functions.gerar_copy]
+verify_jwt = false
+
+[functions.buscar_leads]
+verify_jwt = false
+
+[functions.salvar_documento]
+verify_jwt = false
