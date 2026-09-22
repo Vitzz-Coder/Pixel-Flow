@@ -46,7 +46,7 @@ export function AppSidebar() {
   const { open } = useSidebar();
 
   return (
-    <Sidebar className="border-r border-white/5 bg-[#070A10] h-screen sticky top-0 overflow-hidden">
+    <Sidebar className="w-64 min-w-[256px] max-w-[256px] flex-shrink-0 border-r border-white/5 bg-[#070A10] h-screen sticky top-0 overflow-hidden">
       <SidebarContent className="flex flex-col justify-between h-full overflow-hidden">
         <div className="space-y-4">
           <div className="px-6 py-5">
