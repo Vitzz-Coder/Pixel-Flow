@@ -16,7 +16,8 @@ import {
   Save,
   Sparkles,
   Filter
-} from "lucide-react";
+} from "lucide-//L_S_T_I_O_N_L_Y_C_O_P_Y_I_S_L_U_C_I_D_E_R_E_A_C_T";
+import { Search as SearchIcon, Loader2 as Loader2Icon, MapPin as MapPinIcon, Phone as PhoneIcon, Star as StarIcon, MessageCircle as MessageCircleIcon, Save as SaveIcon, Sparkles as SparklesIcon, Filter as FilterIcon } from "lucide-react";
 
 interface Empresa {
   nome: string;
@@ -120,7 +121,7 @@ const ProspectorLeads = () => {
       <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
             <Input
               placeholder="Nicho / Tipo de Negócio (ex: Academias)"
               className="pl-10 bg-slate-950/50 border-white/10 focus:border-violet-500/50 focus:ring-violet-500/20 transition-all"
@@ -130,7 +131,7 @@ const ProspectorLeads = () => {
             />
           </div>
           <div className="relative group">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
+            <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
             <Input
               placeholder="Cidade / Região (ex: Jundiaí - SP)"
               className="pl-10 bg-slate-950/50 border-white/10 focus:border-violet-500/50 focus:ring-violet-500/20 transition-all"
@@ -146,12 +147,12 @@ const ProspectorLeads = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                 Buscando...
               </>
             ) : (
               <>
-                <Search className="mr-2 h-4 w-4" />
+                <SearchIcon className="mr-2 h-4 w-4" />
                 Prospectar Leads
               </>
             )}
@@ -161,7 +162,7 @@ const ProspectorLeads = () => {
         {/* Quick Filters */}
         <div className="flex items-center gap-3 overflow-x-auto pb-2">
           <div className="flex items-center gap-2 text-slate-500 mr-2">
-            <Filter className="h-3 w-3" />
+            <FilterIcon className="h-3 w-3" />
             <span className="text-xs font-medium uppercase tracking-wider">Filtros Rápidos:</span>
           </div>
           {["Todos", "Sem Site", "Melhor Avaliados"].map((filter) => (
@@ -207,15 +208,15 @@ const ProspectorLeads = () => {
 
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <MapPin className="h-4 w-4 text-violet-400 shrink-0" />
+                    <MapPinIcon className="h-4 w-4 text-violet-400 shrink-0" />
                     <span className="truncate">{empresa.endereco}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <Phone className="h-4 w-4 text-violet-400 shrink-0" />
+                    <PhoneIcon className="h-4 w-4 text-violet-400 shrink-0" />
                     <span>{empresa.telefone}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                    <StarIcon className="h-4 w-4 text-amber-400 fill-amber-400" />
                     <span className="text-slate-200 font-medium">{empresa.avaliacao || "N/A"}</span>
                     <span className="text-slate-500 text-xs">/ 5.0</span>
                   </div>
@@ -225,9 +226,9 @@ const ProspectorLeads = () => {
                   <Button
                     variant="outline"
                     className="text-xs h-9 bg-white/5 border-white/10 hover:bg-violet-600 hover:text-white transition-all flex items-center gap-2"
-                    onClick={() => navigate(`/gerador-copy?empresa=${encodeURIComponent(empresa.nome)}`)}
+                    onClick={() => navigate(`/gerador-copy?empresa=${encodeURIComponent(empresa.nome)}&niche=${encodeURIComponent(tipoNegocio)}`)}
                   >
-                    <Sparkles className="h-3 w-3" />
+                    <SparklesIcon className="h-3 w-3" />
                     Para Copy IA
                   </Button>
                   <div className="flex gap-2">
@@ -236,14 +237,14 @@ const ProspectorLeads = () => {
                       className="h-9 w-9 p-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition-all"
                       onClick={() => window.open(`https://wa.me/${empresa.telefone.replace(/\D/g,'')}`, '_blank')}
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <MessageCircleIcon className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="outline"
                       className="h-9 w-9 p-0 bg-slate-800 border-white/10 hover:bg-violet-600 hover:text-white transition-all"
                       onClick={() => handleSaveLead(empresa)}
                     >
-                      <Save className="h-4 w-4" />
+                      <SaveIcon className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -255,7 +256,7 @@ const ProspectorLeads = () => {
         !isLoading && (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
             <div className="h-20 w-20 rounded-full bg-slate-900/50 flex items-center justify-center border border-white/5">
-              <Search className="h-8 w-8 text-slate-600" />
+              <SearchIcon className="h-8 w-8 text-slate-600" />
             </div>
             <div className="space-y-1">
               <p className="text-slate-300 font-medium">Nenhum lead prospectado ainda</p>

@@ -1,421 +1,301 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  Sparkles,
+  Loader2,
+  Copy,
+  Save,
+  Layout,
+  Palette,
+  Type,
+  Check
+} from "lucide-react";
 
-const TOTAL_STEPS = 10;
+interface BriefingResult {
+  estrutura: string[];
+  copy: {
+    secao: string;
+    texto: string;
+  }[];
+  estilo: {
+    cores: string;
+    fontes: string;
+  };
+}
 
 export default function ConstrutorSites() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const { toast } = useToast();
-  
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [briefing, setBriefing] = useState<BriefingResult | null>(null);
+
   const [formData, setFormData] = useState({
     nomeProjeto: "",
-    publicoAlvo: "",
-    objetivo: "",
-    estiloVisual: "",
-    tomVoz: "",
-    corPrimaria: "",
-    corSecundaria: "",
-    fonte: "",
-    paginas: "",
-    ctaPrincipal: "",
-    funcionalidadeBackend: "",
-    moduloDados: "nao",
-    tabelaServicos: "",
-    componentesVisuais: "",
-    conteudoIA: "nao",
-    linkReferencia: "",
+    nicho: "Academias",
+    objetivo: "Gerar Leads no WhatsApp",
+    estilo: "Moderno/Minimalista",
   });
 
-  const updateField = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const handleGenerate = async () => {
+    if (!formData.nomeProjeto) {
+      toast.error("Por favor, informe o nome do projeto");
+      return;
+    }
 
-  const nextStep = () => {
-    if (currentStep < TOTAL_STEPS) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
-
-  const generatePrompt = async () => {
-    const prompt = `Aja como um Engenheiro de Produto Sênior. Sua missão é criar um aplicativo SaaS completo e de alta conversão para o projeto ${formData.nomeProjeto}.
-
-O público-alvo é ${formData.publicoAlvo}. O objetivo é ${formData.objetivo}. O estilo visual deve ser ${formData.estiloVisual} e ${formData.tomVoz} com as cores ${formData.corPrimaria} e ${formData.corSecundaria} e fonte ${formData.fonte}.${formData.linkReferencia ? ` O design deve se inspirar no layout de ${formData.linkReferencia}.` : ""}
-
-A aplicação deve ser multi-página com a estrutura: ${formData.paginas}. O CTA principal é ${formData.ctaPrincipal}. A funcionalidade de backend principal é ${formData.funcionalidadeBackend} e deve ser implementada no Supabase.${formData.moduloDados === "sim" ? ` Crie as seguintes tabelas no banco de dados: ${formData.tabelaServicos}.` : ""} O dashboard deve incluir ${formData.componentesVisuais}.
-
-Gere os textos do site de forma automática e criativa, focando em alta conversão.`;
-
+    setIsLoading(true);
     try {
-      // Salvar documento via Edge Function
-      const { error } = await supabase.functions.invoke("salvar_documento", {
+      const { data, error } = await supabase.functions.invoke("gerar_briefing", {
         body: {
-          tipo: "Prompt",
-          nome_cliente: formData.nomeProjeto,
-          conteudo_gerado: prompt,
+          projeto: formData.nomeProjeto,
+          nicho: formData.nicho,
+          objetivo: formData.objetivo,
+          estilo: formData.estilo,
         },
       });
 
-      if (error) {
-        console.error("Erro ao salvar documento:", error);
-        toast({
-          title: "Erro ao salvar",
-          description: "Não foi possível salvar o prompt no repositório.",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (error) throw error;
 
-      // Copiar para área de transferência
-      await navigator.clipboard.writeText(prompt);
-      
-      toast({
-        title: "Prompt Gerado!",
-        description: "O prompt foi salvo e copiado para a área de transferência.",
-      });
+      if (data?.success && data?.briefing) {
+        const parsed = typeof data.briefing === 'string'
+          ? JSON.parse(data.briefing)
+          : data.briefing;
+        setBriefing(parsed);
+        toast.success("Briefing gerado com sucesso!");
+      } else {
+        toast.error("Erro ao gerar briefing.");
+      }
     } catch (error) {
-      console.error("Erro:", error);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao processar o prompt.",
-        variant: "destructive",
-      });
+      console.error("Error:", error);
+      toast.error("Erro na integração com a IA.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="nomeProjeto">Nome do Projeto</Label>
-              <Input
-                id="nomeProjeto"
-                placeholder="Ex: AgênciaTech Digital"
-                value={formData.nomeProjeto}
-                onChange={(e) => updateField("nomeProjeto", e.target.value)}
-                maxLength={100}
-              />
-            </div>
-            <div>
-              <Label htmlFor="publicoAlvo">Público-alvo</Label>
-              <Textarea
-                id="publicoAlvo"
-                placeholder="Ex: Pequenas empresas que precisam de presença digital"
-                value={formData.publicoAlvo}
-                onChange={(e) => updateField("publicoAlvo", e.target.value)}
-                maxLength={500}
-              />
-            </div>
-          </div>
-        );
+  const copyFullBriefing = async () => {
+    if (!briefing) return;
+    const text = `PROJETO: ${formData.nomeProjeto}\n\nESTRUTURA:\n${briefing.estrutura.join(", ")}\n\nCOPY:\n${briefing.copy.map(c => `${c.secao}: ${c.texto}`).join("\n\n")}\n\nESTILO:\nCores: ${briefing.estilo.cores}\nFontes: ${briefing.estilo.fontes}`;
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast.success("Briefing copiado!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-      case 2:
-        return (
-          <div className="space-y-4">
-            <Label>Objetivo Principal</Label>
-            <RadioGroup value={formData.objetivo} onValueChange={(value) => updateField("objetivo", value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="gerar-leads" id="leads" />
-                <Label htmlFor="leads" className="cursor-pointer">Gerar Leads</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="vendas-online" id="vendas" />
-                <Label htmlFor="vendas" className="cursor-pointer">Vendas Online</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="agendamento" id="agendamento" />
-                <Label htmlFor="agendamento" className="cursor-pointer">Agendamento de Serviços</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="portfolio" id="portfolio" />
-                <Label htmlFor="portfolio" className="cursor-pointer">Portfólio/Vitrine</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="informativo" id="informativo" />
-                <Label htmlFor="informativo" className="cursor-pointer">Site Informativo</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="estiloVisual">Estilo Visual</Label>
-              <Input
-                id="estiloVisual"
-                placeholder="Ex: Moderno, Minimalista, Elegante, Vibrante"
-                value={formData.estiloVisual}
-                onChange={(e) => updateField("estiloVisual", e.target.value)}
-                maxLength={100}
-              />
-            </div>
-            <div>
-              <Label htmlFor="tomVoz">Tom de Voz</Label>
-              <Input
-                id="tomVoz"
-                placeholder="Ex: Profissional, Descontraído, Inspirador, Técnico"
-                value={formData.tomVoz}
-                onChange={(e) => updateField("tomVoz", e.target.value)}
-                maxLength={100}
-              />
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="corPrimaria">Cor Primária</Label>
-              <Input
-                id="corPrimaria"
-                placeholder="Ex: Azul vibrante, Verde neon, Roxo escuro"
-                value={formData.corPrimaria}
-                onChange={(e) => updateField("corPrimaria", e.target.value)}
-                maxLength={50}
-              />
-            </div>
-            <div>
-              <Label htmlFor="corSecundaria">Cor Secundária</Label>
-              <Input
-                id="corSecundaria"
-                placeholder="Ex: Branco, Cinza claro, Preto"
-                value={formData.corSecundaria}
-                onChange={(e) => updateField("corSecundaria", e.target.value)}
-                maxLength={50}
-              />
-            </div>
-            <div>
-              <Label htmlFor="fonte">Fonte Preferida</Label>
-              <Input
-                id="fonte"
-                placeholder="Ex: Inter, Roboto, Playfair Display, Montserrat"
-                value={formData.fonte}
-                onChange={(e) => updateField("fonte", e.target.value)}
-                maxLength={50}
-              />
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="paginas">Páginas do Site</Label>
-              <Textarea
-                id="paginas"
-                placeholder="Ex: Home, Sobre, Serviços, Portfolio, Contato"
-                value={formData.paginas}
-                onChange={(e) => updateField("paginas", e.target.value)}
-                maxLength={300}
-              />
-            </div>
-            <div>
-              <Label htmlFor="ctaPrincipal">CTA Principal (Call-to-Action)</Label>
-              <Input
-                id="ctaPrincipal"
-                placeholder="Ex: Solicitar Orçamento, Agendar Consulta, Começar Agora"
-                value={formData.ctaPrincipal}
-                onChange={(e) => updateField("ctaPrincipal", e.target.value)}
-                maxLength={100}
-              />
-            </div>
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="space-y-4">
-            <Label>Funcionalidade de Backend</Label>
-            <RadioGroup value={formData.funcionalidadeBackend} onValueChange={(value) => updateField("funcionalidadeBackend", value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="nenhuma" id="nenhuma" />
-                <Label htmlFor="nenhuma" className="cursor-pointer">Nenhuma (Site estático)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="login" id="login" />
-                <Label htmlFor="login" className="cursor-pointer">Sistema de Login</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="agendamento" id="agendamento-backend" />
-                <Label htmlFor="agendamento-backend" className="cursor-pointer">Sistema de Agendamento</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="dashboard" id="dashboard" />
-                <Label htmlFor="dashboard" className="cursor-pointer">Dashboard Administrativo</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="formulario" id="formulario" />
-                <Label htmlFor="formulario" className="cursor-pointer">Formulário de Contato com DB</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        );
-
-      case 7:
-        return (
-          <div className="space-y-4">
-            <Label>Módulo de Dados (Tabelas no Banco)</Label>
-            <RadioGroup value={formData.moduloDados} onValueChange={(value) => updateField("moduloDados", value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="nao" id="dados-nao" />
-                <Label htmlFor="dados-nao" className="cursor-pointer">Não precisa</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="sim" id="dados-sim" />
-                <Label htmlFor="dados-sim" className="cursor-pointer">Sim, preciso de banco de dados</Label>
-              </div>
-            </RadioGroup>
-            
-            {formData.moduloDados === "sim" && (
-              <div className="mt-4">
-                <Label htmlFor="tabelaServicos">Descreva as tabelas necessárias</Label>
-                <Textarea
-                  id="tabelaServicos"
-                  placeholder="Ex: Tabela de usuários, Tabela de serviços, Tabela de agendamentos"
-                  value={formData.tabelaServicos}
-                  onChange={(e) => updateField("tabelaServicos", e.target.value)}
-                  maxLength={500}
-                />
-              </div>
-            )}
-          </div>
-        );
-
-      case 8:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="componentesVisuais">Componentes Visuais de Destaque</Label>
-              <Textarea
-                id="componentesVisuais"
-                placeholder="Ex: Carrossel de imagens, Cards com hover animado, Seção de depoimentos, Galeria de portfolio"
-                value={formData.componentesVisuais}
-                onChange={(e) => updateField("componentesVisuais", e.target.value)}
-                maxLength={500}
-              />
-            </div>
-          </div>
-        );
-
-      case 9:
-        return (
-          <div className="space-y-4">
-            <Label>Conteúdo Gerado por IA</Label>
-            <RadioGroup value={formData.conteudoIA} onValueChange={(value) => updateField("conteudoIA", value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="nao" id="conteudo-nao" />
-                <Label htmlFor="conteudo-nao" className="cursor-pointer">Não, fornecerei o conteúdo</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="sim" id="conteudo-sim" />
-                <Label htmlFor="conteudo-sim" className="cursor-pointer">Sim, gere textos automaticamente</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        );
-
-      case 10:
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="linkReferencia">Link de Site de Referência (Opcional)</Label>
-              <Input
-                id="linkReferencia"
-                type="url"
-                placeholder="https://exemplo.com"
-                value={formData.linkReferencia}
-                onChange={(e) => updateField("linkReferencia", e.target.value)}
-                maxLength={500}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Cole o link de um site que você admira para inspiração de design
-              </p>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
+  const handleSave = async () => {
+    if (!briefing) return;
+    try {
+      const { error } = await supabase.from('projetos').insert([
+        {
+          nome: formData.nomeProjeto,
+          nicho: formData.nicho,
+          briefing: JSON.stringify(briefing),
+          data_criacao: new Date().toISOString(),
+        }
+      ]);
+      if (error) throw error;
+      toast.success("Projeto salvo com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao salvar projeto.");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
-          Construtor de Sites IA
-        </h1>
-        <p className="text-muted-foreground">
-          Responda 10 perguntas para gerar o prompt perfeito de criação do seu site
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">
-              Passo {currentStep} de {TOTAL_STEPS}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {Math.round((currentStep / TOTAL_STEPS) * 100)}%
-            </span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+      {/* Left Column: Configuration */}
+      <div className="lg:col-span-4 space-y-6">
+        <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl space-y-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Layout className="h-5 w-5 text-violet-400" />
+            <h2 className="text-xl font-bold text-white">Briefing de Site</h2>
           </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all duration-300"
-              style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
-            />
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Nome da Empresa/Projeto</Label>
+              <Input
+                placeholder="Ex: Studio Fit"
+                className="bg-slate-950/50 border-white/10 focus:border-violet-500/50 transition-all"
+                value={formData.nomeProjeto}
+                onChange={(e) => setFormData({ ...formData, nomeProjeto: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Nicho de Atuação</Label>
+              <Select
+                value={formData.nicho}
+                onValueChange={(v) => setFormData({ ...formData, nicho: v })}
+              >
+                <SelectTrigger className="bg-slate-950/50 border-white/10">
+                  <SelectValue placeholder="Selecione o nicho" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                  <SelectItem value="Academias">Academias</SelectItem>
+                  <SelectItem value="Restaurantes">Restaurantes</SelectItem>
+                  <SelectItem value="Clínicas">Clínicas</SelectItem>
+                  <SelectItem value="Advogados">Advogados</SelectItem>
+                  <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Objetivo do Site</Label>
+              <Select
+                value={formData.objetivo}
+                onValueChange={(v) => setFormData({ ...formData, objetivo: v })}
+              >
+                <SelectTrigger className="bg-slate-950/50 border-white/10">
+                  <SelectValue placeholder="Selecione o objetivo" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                  <SelectItem value="Gerar Leads no WhatsApp">Gerar Leads no WhatsApp</SelectItem>
+                  <SelectItem value="Vender Serviço">Vender Serviço</SelectItem>
+                  <SelectItem value="Autoridade/Institucional">Autoridade/Institucional</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Estilo Visual</Label>
+              <div className="flex flex-wrap gap-2">
+                {["Moderno/Minimalista", "Corporativo", "Dark Neon"].map((style) => (
+                  <button
+                    key={style}
+                    onClick={() => setFormData({ ...formData, estilo: style })}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                      formData.estilo === style
+                        ? "bg-violet-600 border-violet-500 text-white shadow-md shadow-violet-500/20"
+                        : "bg-slate-800/50 border-white/5 text-slate-400 hover:border-white/20 hover:text-slate-200"
+                    }`}
+                  >
+                    {style}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <Card className="p-6 bg-gradient-card border-border/50 shadow-card">
-        <div className="min-h-[300px]">{renderStep()}</div>
-
-        <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
           <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
+            onClick={handleGenerate}
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/25 py-6 font-semibold transition-all active:scale-95"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Anterior
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando Briefing...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Gerar Briefing com IA
+              </>
+            )}
           </Button>
-
-          {currentStep < TOTAL_STEPS ? (
-            <Button onClick={nextStep}>
-              Próximo
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={generatePrompt} className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              Gerar Prompt de Criação
-            </Button>
-          )}
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-4 bg-secondary/30 border-border/30">
-        <p className="text-sm text-muted-foreground">
-          💡 <strong>Dica:</strong> Seja específico nas suas respostas para obter um prompt mais detalhado e preciso.
-        </p>
-      </Card>
+      {/* Results Area */}
+      <div className="lg:col-span-8 space-y-6">
+        {!briefing ? (
+          <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-slate-900/30 border border-dashed border-white/10 rounded-3xl">
+            <div className="p-6 rounded-full bg-slate-800/50 text-slate-600 mb-4">
+              <Layout className="h-12 w-12" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-300">Nenhum briefing gerador</h3>
+            <p className="text-slate-500 max-w-sm mx-auto mt-2">
+              Configure as informações do projeto no painel lateral para gerar a estrutura completa do seu site.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Briefing Estratégico</h2>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/5 border-white/10 hover:bg-violet-600 hover:text-white transition-all flex items-center gap-2"
+                  onClick={copyFullBriefing}
+                >
+                  {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                  {copied ? "Copiado!" : "Copiar Tudo"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/5 border-white/10 hover:bg-violet-600 hover:text-white transition-all flex items-center gap-2"
+                  onClick={handleSave}
+                >
+                  <Save className="h-3 w-3" />
+                  Salvar Projeto
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card 1: Estrutura */}
+              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Layout className="h-5 w-5 text-violet-400" />
+                  <h3 className="text-lg font-bold text-white">Estrutura de Seções</h3>
+                </div>
+                <div className="space-y-2">
+                  {briefing.estrutura.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-white/5 text-slate-300 text-sm">
+                      <span className="h-5 w-5 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-[10px] font-bold">
+                        {i + 1}
+                      </span>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card 2: Guia de Estilo */}
+              <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Palette className="h-5 w-5 text-violet-400" />
+                  <h3 className="text-lg font-bold text-white">Guia de Estilo</h3>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase mb-2">Cores Sugeridas</p>
+                    <p className="text-slate-200 text-sm leading-relaxed">{briefing.estilo.cores}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase mb-2">Tipografia</p>
+                    <p className="text-slate-200 text-sm leading-relaxed">{briefing.estilo.fontes}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Copys (Full Width) */}
+              <div className="md:col-span-2 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Type className="h-5 w-5 text-violet-400" />
+                  <h3 className="text-lg font-bold text-white">Sugestões de Texto e Copy</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {briefing.copy.map((item, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-slate-950/50 border border-white/5 space-y-2">
+                      <p className="text-xs font-bold text-violet-400 uppercase tracking-wider">{item.secao}</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{item.texto}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
