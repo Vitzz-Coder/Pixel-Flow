@@ -12,6 +12,7 @@ import Configuracoes from "./pages/Configuracoes";
 import GerarContrato from "./pages/GerarContrato";
 import ProspectorLeads from "./pages/ProspectorLeads";
 import ConstrutorSites from "./pages/ConstrutorSites";
+import GeradorCopy from "./pages/GeradorCopy";
 import Repositorio from "./pages/Repositorio";
 import NotFound from "./pages/NotFound";
 import { Menu } from "lucide-react";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/gerar-contrato" element={<Layout><GerarContrato /></Layout>} />
           <Route path="/prospector-leads" element={<Layout><ProspectorLeads /></Layout>} />
           <Route path="/construtor-sites" element={<Layout><ConstrutorSites /></Layout>} />
+          <Route path="/gerador-copy" element={<Layout><GeradorCopy /></Layout>} />
           <Route path="/repositorio" element={<Layout><Repositorio /></Layout>} />
           <Route path="/configuracoes" element={<Layout><Configuracoes /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
