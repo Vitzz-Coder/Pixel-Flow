@@ -93,13 +93,13 @@ export function AppSidebar() {
           <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center gap-3">
             <Avatar className="h-10 w-10 border border-white/10 shadow-lg shadow-violet-500/10">
               <AvatarFallback className="bg-gradient-to-br from-violet-500 to-indigo-600 text-white font-bold text-xs">
-                LS
+                PF
               </AvatarFallback>
             </Avatar>
             {open && (
               <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-semibold text-slate-200 truncate">Leandro Santos</p>
-                <p className="text-[10px] text-slate-500 truncate">leandro@pixelflow.lab</p>
+                <p className="text-sm font-semibold text-slate-200 truncate">Pixel Flow User</p>
+                <p className="text-[10px] text-slate-500 truncate">user@pixelflow.lab</p>
                 <Badge variant="outline" className="mt-1 h-4 px-1 text-[8px] text-emerald-400 border-emerald-500/30 bg-emerald-500/10">
                   Plano Pro / Ativo
                 </Badge>

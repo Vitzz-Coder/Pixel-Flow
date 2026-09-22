@@ -90,7 +90,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-4xl font-extrabold mb-1 bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tight">
-              Bem-vindo de volta, Leandro
+              Bem-vindo de volta
             </h1>
             <p className="text-slate-400 text-lg font-medium">
               Sua central de comando para prospecção e fechamento de negócios.
