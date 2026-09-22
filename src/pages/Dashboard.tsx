@@ -7,7 +7,8 @@ import {
   Users,
   FileCheck,
   ArrowRight,
-  Clock
+  Clock,
+  Zap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +22,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchRecent() {
-      // Fetch recent leads from supabase
       const { data, error } = await supabase
         .from('leads')
         .select('id, nome as title, tipo as type, data_criacao as date')
@@ -47,7 +47,8 @@ export default function Dashboard() {
       description: "Encontre novos clientes potenciais",
       icon: Search,
       route: "/prospector-leads",
-      color: "text-blue-500"
+      gradient: "from-violet-500 to-indigo-500",
+      color: "text-violet-400"
     },
     {
       step: 2,
@@ -55,7 +56,8 @@ export default function Dashboard() {
       description: "Crie mensagens persuasivas",
       icon: Sparkles,
       route: "/gerador-copy",
-      color: "text-purple-500"
+      gradient: "from-cyan-500 to-blue-500",
+      color: "text-cyan-400"
     },
     {
       step: 3,
@@ -63,7 +65,8 @@ export default function Dashboard() {
       description: "Formalize o acordo comercial",
       icon: FileText,
       route: "/gerar-contrato",
-      color: "text-green-500"
+      gradient: "from-emerald-500 to-teal-500",
+      color: "text-emerald-400"
     },
     {
       step: 4,
@@ -71,25 +74,32 @@ export default function Dashboard() {
       description: "Defina o escopo do projeto",
       icon: Code,
       route: "/construtor-sites",
-      color: "text-orange-500"
+      gradient: "from-amber-500 to-orange-500",
+      color: "text-amber-400"
     },
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 relative">
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
-            Bem-vindo de volta, Leandro
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Sua central de comando para prospecção e fechamento de negócios.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 relative group">
+            <Zap className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
+            <div className="absolute inset-0 rounded-2xl bg-violet-500/20 blur-lg group-hover:blur-xl transition-all" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-extrabold mb-1 bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent tracking-tight">
+              Bem-vindo de volta, Leandro
+            </h1>
+            <p className="text-slate-400 text-lg font-medium">
+              Sua central de comando para prospecção e fechamento de negócios.
+            </p>
+          </div>
         </div>
         <Button
           size="lg"
-          className="shadow-glow px-6 py-6 text-lg font-semibold"
+          className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/25 px-8 py-6 text-lg font-semibold transition-all hover:scale-105 active:scale-95"
           onClick={() => navigate("/prospector-leads")}
         >
           Iniciar Nova Prospecção
@@ -99,75 +109,54 @@ export default function Dashboard() {
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-card border-border/50 shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Leads Encontrados</p>
-                <p className="text-3xl font-bold mt-1">128</p>
+        {[
+          { label: "Leads Encontrados", value: "128", icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
+          { label: "Contratos Criados", value: "42", icon: FileCheck, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+          { label: "Copies Geradas", value: "89", icon: Sparkles, color: "text-purple-400", bg: "bg-purple-500/10" },
+        ].map((metric, i) => (
+          <Card key={i} className="bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-400 group-hover:text-slate-300 transition-colors">{metric.label}</p>
+                  <p className="text-3xl font-bold mt-1 text-white">{metric.value}</p>
+                </div>
+                <div className={`p-3 rounded-xl ${metric.bg} ${metric.color}`}>
+                  <metric.icon className="h-6 w-6" />
+                </div>
               </div>
-              <div className="p-3 rounded-full bg-blue-500/10 text-blue-500">
-                <Users className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-card border-border/50 shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Contratos Criados</p>
-                <p className="text-3xl font-bold mt-1">42</p>
-              </div>
-              <div className="p-3 rounded-full bg-green-500/10 text-green-500">
-                <FileCheck className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-card border-border/50 shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Copies Geradas</p>
-                <p className="text-3xl font-bold mt-1">89</p>
-              </div>
-              <div className="p-3 rounded-full bg-purple-500/10 text-purple-500">
-                <Sparkles className="h-6 w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Workflow Section */}
       <div className="space-y-6">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold">Fluxo de Trabalho do Prestador de Serviço</h2>
-          <Badge variant="outline" className="text-primary border-primary/30">Sequencial</Badge>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Fluxo de Trabalho do Prestador de Serviço</h2>
+          <Badge variant="outline" className="text-violet-400 border-violet-500/30 bg-violet-500/10 px-2 py-0">Sequencial</Badge>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {workflowSteps.map((step, index) => (
+          {workflowSteps.map((step, javaIndex) => (
             <Card
               key={step.title}
-              className="group relative overflow-hidden border-border/50 hover:border-primary/50 transition-all cursor-pointer bg-gradient-card shadow-card"
+              className="group relative overflow-hidden bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer"
               onClick={() => navigate(step.route)}
             >
+              {/* Neon Top Accent */}
+              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${step.gradient}`} />
+
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-primary opacity-50 uppercase tracking-wider">Passo {step.step}</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Passo {step.step}</span>
                   <step.icon className={`h-5 w-5 ${step.color}`} />
                 </div>
-                <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-                <div className="flex items-center text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">{step.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{step.description}</p>
+                <div className="flex items-center text-xs font-semibold text-violet-400 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                   Acessar agora <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
               </CardContent>
-              {/* Visual Connector (Desktop only) */}
-              {index < workflowSteps.length - 1 && (
-                <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-border/30 z-10" />
-              )}
             </Card>
           ))}
         </div>
@@ -175,10 +164,10 @@ export default function Dashboard() {
 
       {/* Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="lg:col-span-2 bg-gradient-card border-border/50 shadow-card">
+        <Card className="lg:col-span-2 bg-slate-900/60 backdrop-blur-md border-white/10 hover:border-violet-500/50 transition-all duration-300">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
+            <CardTitle className="text-xl text-white flex items-center gap-2">
+              <Clock className="h-5 w-5 text-violet-400" />
               Atividades Recentes
             </CardTitle>
           </CardHeader>
@@ -186,25 +175,30 @@ export default function Dashboard() {
             {recentActivities.length > 0 ? (
               <div className="space-y-4">
                 {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/30 transition-colors border border-transparent hover:border-border/50">
+                  <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/5 hover:border-white/10">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                      <div className="p-2 rounded-lg bg-violet-500/10 text-violet-400">
                         {activity.type === 'Lead' ? <Search className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{activity.title}</p>
-                        <p className="text-xs text-muted-foreground">{activity.date}</p>
+                        <p className="text-sm font-medium text-slate-200">{activity.title}</p>
+                        <p className="text-xs text-slate-500">{activity.date}</p>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="secondary" className="text-[10px] bg-white/5 text-slate-400 border-white/10">
                       {activity.type}
                     </Badge>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 text-muted-foreground">
-                <p>Nenhuma atividade recente encontrada.</p>
+              <div className="text-center py-10 text-slate-500">
+                <div className="flex justify-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center">
+                    <Search className="h-6 w-6 text-slate-600" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium">Nenhuma atividade recente encontrada.</p>
                 <p className="text-xs">Comece prospectando novos leads!</p>
               </div>
             )}
@@ -212,9 +206,12 @@ export default function Dashboard() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="bg-primary/5 border-primary/20 p-6 shadow-card">
-            <h3 className="text-lg font-bold mb-2">Dica do Dia 💡</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+          <Card className="bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border-violet-500/30 p-6 shadow-card backdrop-blur-md">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="h-5 w-5 text-violet-400" />
+              <h3 className="text-lg font-bold text-white">Dica do Dia 💡</h3>
+            </div>
+            <p className="text-sm text-slate-300 leading-relaxed">
               Tente personalizar a primeira frase da sua copy com um dado real encontrado no prospector para aumentar a taxa de conversão em até 3x.
             </p>
           </Card>

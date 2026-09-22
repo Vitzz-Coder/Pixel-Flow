@@ -21,10 +21,14 @@ const queryClient = new QueryClient();
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <SidebarProvider>
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex w-full bg-[#0B0F17] text-slate-200 relative overflow-hidden">
+      {/* Ambient Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none z-0" />
+
       <AppSidebar />
-      <main className="flex-1">
-        <header className="sticky top-0 z-10 h-16 border-b border-border/50 bg-background/80 backdrop-blur-sm flex items-center px-6">
+      <main className="flex-1 relative z-10">
+        <header className="sticky top-0 z-10 h-16 border-b border-white/5 bg-[#0B0F17]/80 backdrop-blur-md flex items-center px-6">
           <SidebarTrigger>
             <Menu className="h-5 w-5" />
           </SidebarTrigger>
